@@ -1,0 +1,16 @@
+{
+  "name": "meme-be",
+  "version": "1.0.0",
+  "description": "meme generator backend",
+  "main": "Server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Squad 4",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mssql": "^7.3.0"
+  }
+}
