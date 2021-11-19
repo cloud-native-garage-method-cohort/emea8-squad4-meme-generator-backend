@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: build-pipeline-run-backend-
+spec:
+  serviceAccountName: build-bot
+  params:
+    - name: source-repo
+      value: https://github.com/cloud-native-garage-method-cohort/emea8-squad4-meme-generator-backend
+    - name: image-repo
+      value: quay.io/levandrejev/squad4-meme-generator-backend
+    - name: app-name
+      value: squad4-meme-generator-backend
+  pipelineRef:
+    name: build-pipeline-backend
+  workspaces:
+    - name: pipeline-shared-data
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi
+          accessModes:
+            - ReadWriteOnce
+    - name: gitops-repository
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 1Gi
+          accessModes:
+            - ReadWriteOnce
+    - name: git-credentials
+      secret:
+        secretName: git-credentials

@@ -1,0 +1,125 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: webhook-receiver-backend
+spec:
+  serviceAccountName: webhook-receiver
+  triggers:
+    - template:
+        name: webhook-receiver-backend
+      bindings:
+        - ref: webhook-receiver-backend
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: webhook-receiver
+rules:
+  - resources:
+      - eventlisteners
+      - triggerbindings
+      - triggertemplates
+    apiGroups:
+      - triggers.tekton.dev
+    verbs:
+      - get
+  - resources:
+      - pipelineruns
+      - pipelineresources
+    apiGroups:
+      - tekton.dev
+    verbs:
+      - create
+  - resources:
+      - configmaps
+    apiGroups:
+      - ""
+    verbs:
+      - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webhook-receiver
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: webhook-receiver
+roleRef:
+  name: webhook-receiver
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - name: webhook-receiver
+    kind: ServiceAccount
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: webhook-receiver-backend
+spec:
+  port:
+    targetPort: 8080
+  to:
+    name: el-webhook-receiver-backend
+    kind: Service
+    weight: 100
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: webhook-receiver-backend
+spec:
+  params:
+    - name: source-repo
+      value: $(body.repository.url)
+    - name: sha
+      value: $(body.head_commit.id)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: webhook-receiver-backend
+spec:
+  params:
+    - name: source-repo
+      description: Source code repository
+    - name: sha
+      description: Precise SHA of the commit to build
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-pipeline-run-backend-
+      spec:
+        serviceAccountName: build-bot
+        params:
+          - name: source-repo
+            value: https://github.com/cloud-native-garage-method-cohort/emea8-squad4-meme-generator-backend
+          - name: image-repo
+            value: quay.io/levandrejev/squad4-meme-generator-backend
+          - name: app-name
+            value: squad4-meme-generator-backend
+        pipelineRef:
+          name: build-pipeline-backend
+        workspaces:
+          - name: pipeline-shared-data
+            volumeClaimTemplate:
+              spec:
+                resources:
+                  requests:
+                    storage: 1Gi
+                accessModes:
+                  - ReadWriteOnce
+          - name: gitops-repository
+            volumeClaimTemplate:
+              spec:
+                resources:
+                  requests:
+                    storage: 1Gi
+                accessModes:
+                  - ReadWriteOnce
+          - name: git-credentials
+            secret:
+              secretName: git-credentials

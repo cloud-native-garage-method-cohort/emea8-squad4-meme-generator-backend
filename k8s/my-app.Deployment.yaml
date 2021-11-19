@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squad4-meme-generator-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/instance: squad4-meme-generator-backend
+      app.kubernetes.io/name: squad4-meme-generator-backend
+  template: 
+    metadata:
+      labels:
+        app.kubernetes.io/instance: squad4-meme-generator-backend
+        app.kubernetes.io/name: squad4-meme-generator-backend
+    spec:
+      containers:
+      - name: squad4-meme-generator-backend
+        image: quay.io/levandrejev/squad4-meme-generator-backend:4a6a1688414546b2fb0c8e5ef0573ea39d7e8932
