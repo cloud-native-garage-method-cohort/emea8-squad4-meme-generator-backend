@@ -1,0 +1,12 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: squad4-meme-generator-svc
+spec:
+  tls:
+    termination: edge
+  to:
+    name: squad4-meme-generator-backend-svc
+    kind: Service
+    weight: 100
+  wildcardPolicy: None
