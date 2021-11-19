@@ -8,7 +8,7 @@ app.get("/memes", function (req, res) {
   var config = {
     user: "SA",
     password: "YourStrong@Passw0rd",
-    server: "localhost", //Service in OS
+    server: "host.docker.internal", //Service of DB in OS
     database: "MemeDB",
     trustServerCertificate: true,
   };
