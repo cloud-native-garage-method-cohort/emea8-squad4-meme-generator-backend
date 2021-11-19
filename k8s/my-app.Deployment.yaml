@@ -16,4 +16,5 @@ spec:
     spec:
       containers:
       - name: squad4-meme-generator-backend
-        image: quay.io/levandrejev/squad4-meme-generator-backend:4a6a1688414546b2fb0c8e5ef0573ea39d7e8932
+        image: quay.io/levandrejev/squad4-meme-generator-backend:446ee3d77fd2552dbcc37351fe4eaa4fb6c3ef81
+        
